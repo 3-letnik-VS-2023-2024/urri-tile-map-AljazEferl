@@ -89,6 +89,7 @@ public class GameScreen extends ScreenAdapter {
     public void show() {
         map = assetManager.get(AssetPaths.TILES); //Rethink add with manager?
 
+
         camera = new OrthographicCamera();
         viewport = new FitViewport(GameConfig.WIDTH, GameConfig.HEIGHT, camera);
         hudViewport = new FitViewport(GameConfig.WIDTH, GameConfig.HEIGHT);
@@ -116,7 +117,7 @@ public class GameScreen extends ScreenAdapter {
         engine.addSystem(new RenderSystem(batch, viewport));
         engine.addSystem(new StartUpSystem());
         engine.addSystem(new CleanUpSystem());
-        engine.addSystem(new CollisionSystem());
+        engine.addSystem(new CollisionSystem(assetManager));
         engine.addSystem(new CameraMovementSystem());
         engine.addSystem(new MowerMusicSystem(assetManager));
 

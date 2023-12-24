@@ -4,27 +4,38 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Intersector;
 
+import si.um.feri.lpm.tile.assets.AssetDescriptors;
+import si.um.feri.lpm.tile.assets.RegionNames;
 import si.um.feri.lpm.tile.common.GameManager;
 import si.um.feri.lpm.tile.ecs.component.BoundsComponent;
+import si.um.feri.lpm.tile.ecs.component.MovementComponent;
 import si.um.feri.lpm.tile.ecs.component.MowerComponent;
 import si.um.feri.lpm.tile.ecs.component.ObstacleComponent;
+import si.um.feri.lpm.tile.ecs.component.TextureComponent;
 import si.um.feri.lpm.tile.ecs.system.passive.SoundSystem;
 import si.um.feri.lpm.tile.ecs.system.passive.TiledSystem;
 import si.um.feri.lpm.tile.util.Mappers;
 
 public class CollisionSystem extends EntitySystem {
 
+    private TextureAtlas gamePlayAtlas;
     private static final Family FAMILY_MOWER = Family.all(MowerComponent.class, BoundsComponent.class).get();
     private static final Family FAMILY_OBSTACLE = Family.all(ObstacleComponent.class, BoundsComponent.class).get();
 
     private SoundSystem soundSystem;
     private TiledSystem tiledSystem;
+    private final AssetManager assetManager;
 
-    public CollisionSystem() {
+    public CollisionSystem( AssetManager assetManager) {
+        this.assetManager = assetManager;
     }
+
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -39,11 +50,14 @@ public class CollisionSystem extends EntitySystem {
         ImmutableArray<Entity> mowers = getEngine().getEntitiesFor(FAMILY_MOWER);
         ImmutableArray<Entity> obstacles = getEngine().getEntitiesFor(FAMILY_OBSTACLE);
 
-        for (Entity mower : mowers) { //pick collision by tile
+        for (Entity mower : mowers) { // pick collision by tile
             BoundsComponent firstBounds = Mappers.BOUNDS.get(mower);
+            TextureComponent mowerTexture = Mappers.TEXTURE.get(mower); // Assuming you have a TextureComponent
+            boolean collidedWithObstacle = false; // Flag to track if there's any collision with an obstacle
 
             if (tiledSystem.collideWith(firstBounds.rectangle)) {
-                soundSystem.pick();
+                // Handle the collision with the tiled system
+                // soundSystem.pick();
             }
 
             for (Entity obstacle : obstacles) {
@@ -55,10 +69,22 @@ public class CollisionSystem extends EntitySystem {
                 BoundsComponent secondBounds = Mappers.BOUNDS.get(obstacle);
                 if (Intersector.overlaps(firstBounds.rectangle, secondBounds.rectangle)) {
                     // obstacleComponent.hit = true;
-                    GameManager.INSTANCE.damage();
+                    // GameManager.INSTANCE.damage();
                     soundSystem.obstacle();
+                    gamePlayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
+                    mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.ASTROUNAUT);
+
+                    mower.getComponent(MovementComponent.class).speed *= 0.9;
+                    collidedWithObstacle = true;
                 }
             }
+
+
+            if (!collidedWithObstacle) {
+                gamePlayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
+                mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.MOWER);
+            }
         }
+
     }
 }

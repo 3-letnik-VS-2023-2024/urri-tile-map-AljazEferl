@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Array;
 import si.um.feri.lpm.tile.common.GameManager;
 import si.um.feri.lpm.tile.config.GameConfig;
 import si.um.feri.lpm.tile.ecs.component.BoundsComponent;
+import si.um.feri.lpm.tile.ecs.component.MovementComponent;
 import si.um.feri.lpm.tile.ecs.component.ObstacleComponent;
 import si.um.feri.lpm.tile.util.OrthogonalTiledMapRendererStopStartAnimated;
 
@@ -32,6 +33,7 @@ public class TiledSystem extends EntitySystem {
     private float heightMapInPx;
     private TiledMapTileLayer collideTileLayer;
     private MapLayer collideObjectsLayer;
+    private MapLayer collideObjectsLayer1;
     private final Rectangle tmp;
     private final Rectangle tmpArea;
     private Array<BoundsComponent> debug;
@@ -58,8 +60,9 @@ public class TiledSystem extends EntitySystem {
         mapRenderer.setAnimate(true);
 
         TiledMapTileLayer tiledLayer = (TiledMapTileLayer) tiledMap.getLayers().get("l_background");
-        collideTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get("l_grass");
+        collideTileLayer = (TiledMapTileLayer) tiledMap.getLayers().get("l_treasure");
         collideObjectsLayer = tiledMap.getLayers().get("l_objects");
+        collideObjectsLayer1 = tiledMap.getLayers().get("l_moving");
         widthInt = tiledLayer.getWidth();
         heightInt = tiledLayer.getHeight();
         tileWidth = tiledLayer.getTileWidth();
@@ -87,6 +90,7 @@ public class TiledSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         addObstacle(collideObjectsLayer, engine);
+        addObstacle(collideObjectsLayer1,engine);
 
         // add debug bounds
         if (GameConfig.debug) {
@@ -121,6 +125,19 @@ public class TiledSystem extends EntitySystem {
     }
 
     public boolean collideWith(Rectangle rectangle) {
+        MapObjects movingObjects = collideObjectsLayer1.getObjects();
+
+        for (MapObject object : movingObjects) {
+            if (object instanceof RectangleMapObject) {
+                Rectangle movingObjectRect = ((RectangleMapObject) object).getRectangle();
+
+                if (movingObjectRect.overlaps(rectangle)) {
+                   // GameManager.INSTANCE.incResult();
+                    return true;
+                }
+            }
+        }
+
         tmpArea.set(rectangle.x - tileWidth, rectangle.y - tileHeight, rectangle.width + tileWidth * 2, rectangle.height + tileHeight * 2);
         int i = 0;  // init tiled checked
         if (GameConfig.debug) { // area that will be searched
@@ -147,9 +164,11 @@ public class TiledSystem extends EntitySystem {
                     if (tmp.overlaps(rectangle)) {
                         collideTileLayer.setCell(ix, iy, null);
                         GameManager.INSTANCE.incResult();
+
                         result = true;
                     }
                 }
+
                 ix++;
                 dx += tileWidth;
             } while (dx < tmpArea.width);
