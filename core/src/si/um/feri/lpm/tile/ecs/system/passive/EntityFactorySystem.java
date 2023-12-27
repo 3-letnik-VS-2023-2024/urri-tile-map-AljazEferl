@@ -64,7 +64,7 @@ public class EntityFactorySystem extends EntitySystem {
         WorldWrapComponent worldWrap = engine.createComponent(WorldWrapComponent.class);
 
         TextureComponent texture = engine.createComponent(TextureComponent.class);
-        texture.region = gamePlayAtlas.findRegion(RegionNames.MOWER);
+        texture.region = gamePlayAtlas.findRegion(RegionNames.CAR1);
 
         ZOrderComponent zOrder = engine.createComponent(ZOrderComponent.class);
         zOrder.z = MOWER_Z_ORDER;

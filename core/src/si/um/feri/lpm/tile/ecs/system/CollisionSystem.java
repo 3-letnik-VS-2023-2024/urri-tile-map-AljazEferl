@@ -72,7 +72,7 @@ public class CollisionSystem extends EntitySystem {
                     // GameManager.INSTANCE.damage();
                     soundSystem.obstacle();
                     gamePlayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
-                    mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.ASTROUNAUT);
+                    mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.CAR2);
 
                     mower.getComponent(MovementComponent.class).speed *= 0.9;
                     collidedWithObstacle = true;
@@ -82,7 +82,7 @@ public class CollisionSystem extends EntitySystem {
 
             if (!collidedWithObstacle) {
                 gamePlayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
-                mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.MOWER);
+                mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.CAR1);
             }
         }
 
