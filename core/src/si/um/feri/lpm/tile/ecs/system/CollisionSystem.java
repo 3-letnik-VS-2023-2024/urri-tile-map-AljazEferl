@@ -50,13 +50,12 @@ public class CollisionSystem extends EntitySystem {
         ImmutableArray<Entity> mowers = getEngine().getEntitiesFor(FAMILY_MOWER);
         ImmutableArray<Entity> obstacles = getEngine().getEntitiesFor(FAMILY_OBSTACLE);
 
-        for (Entity mower : mowers) { // pick collision by tile
+        for (Entity mower : mowers) {
             BoundsComponent firstBounds = Mappers.BOUNDS.get(mower);
-            TextureComponent mowerTexture = Mappers.TEXTURE.get(mower); // Assuming you have a TextureComponent
-            boolean collidedWithObstacle = false; // Flag to track if there's any collision with an obstacle
+            TextureComponent mowerTexture = Mappers.TEXTURE.get(mower);
+            boolean collidedWithObstacle = false;
 
             if (tiledSystem.collideWith(firstBounds.rectangle)) {
-                // Handle the collision with the tiled system
                 // soundSystem.pick();
             }
 
