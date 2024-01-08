@@ -67,8 +67,8 @@ public class CollisionSystem extends EntitySystem {
 
                 BoundsComponent secondBounds = Mappers.BOUNDS.get(obstacle);
                 if (Intersector.overlaps(firstBounds.rectangle, secondBounds.rectangle)) {
-                    // obstacleComponent.hit = true;
-                    // GameManager.INSTANCE.damage();
+                     //obstacleComponent.hit = true;
+                     //GameManager.INSTANCE.damage();
                     soundSystem.obstacle();
                     gamePlayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
                     mowerTexture.region = gamePlayAtlas.findRegion(RegionNames.CAR2);
